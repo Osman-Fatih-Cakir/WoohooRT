@@ -1,2 +1,2 @@
-# Woohoo
+# WoohooRT
 A path tracer.

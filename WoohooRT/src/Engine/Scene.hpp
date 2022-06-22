@@ -29,27 +29,7 @@ namespace WoohooRT
       return m_allGeometries;
     }
 
-    inline bool Hit(const Ray& ray, float tMin, float tMax, Intersection& intersection)
-    {
-      Intersection tempIntersection; // TODO why? and optimize out
-      bool hitAnything = false;
-      float closestSoFar = tMax;
-
-      for (const auto geometry : m_allGeometries)
-      {
-        if (geometry->Hit(ray, tMin, tMax, tempIntersection))
-        {
-          hitAnything = true;
-          if (closestSoFar > tempIntersection.t)
-          {
-            closestSoFar = tempIntersection.t;
-            intersection = tempIntersection;
-          }
-        }
-      }
-
-      return hitAnything;
-    }
+    bool Hit(const Ray& ray, float tMin, float tMax, Intersection& intersection) const;
 
   private:
     std::vector<std::shared_ptr<Geometry>> m_allGeometries;

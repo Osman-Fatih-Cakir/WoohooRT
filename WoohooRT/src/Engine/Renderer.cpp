@@ -3,15 +3,29 @@
 
 #include <iostream>
 
+#include "glm/glm.hpp"
+
 #include "MathUtils.hpp"
 #include "../Geometry/Sphere.hpp"
+#include "../Material/LambertianMaterial.hpp"
+#include "../Material/MetalMaterial.hpp"
 
 namespace WoohooRT
 {
-  float aspect = 16.0f / 9.0f;
-
   CPURenderer::CPURenderer()
   {
+    float aspect = 16.0f / 9.0f;
+    int imageWidth = 400;
+    int imageHeight = static_cast<int>(imageWidth / aspect);
+
+    m_samplesPerPixel = 100;
+    m_maxBounce = 50;
+
+    // Allocate output buffer
+    m_outputBuffer = new int[3 * imageWidth * imageHeight];
+    m_outputBufferLength = 3 * imageWidth * imageHeight;
+    m_outputBufferOffset = 0;
+
     // Camera
     m_camera = std::shared_ptr<Camera>
     (
@@ -25,12 +39,25 @@ namespace WoohooRT
     );
 
     // Image
-    m_image = std::shared_ptr<Image>(new Image(400, static_cast<int>(400 / aspect)));
+    m_image = std::shared_ptr<Image>(new Image(imageWidth, imageHeight));
 
     // Scene
+    auto lambertianMat1 = std::make_shared<LambertianMaterial>(Vec3(0.8f, 0.8f, 0.0f));
+    auto lambertianMat2 = std::make_shared<LambertianMaterial>(Vec3(0.7f, 0.3f, 0.3f));
+    auto metalMat1 = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.8f, 0.8f), 0.0f);
+    auto metalMat2 = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.6f, 0.2f), 0.5f);
+
     m_scene = std::shared_ptr<Scene>(new Scene());
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f)));
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f)));
+
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f, lambertianMat1)));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f, lambertianMat2)));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, metalMat1)));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(1.0f, 0.0f, -1.0f), 0.5f, metalMat2)));
+  }
+
+  CPURenderer::~CPURenderer()
+  {
+    delete m_outputBuffer;
   }
 
   void CPURenderer::Render()
@@ -43,44 +70,76 @@ namespace WoohooRT
 
       for (int i = 0; i < m_image->m_width; ++i)
       {
-        float u = float(i) / (m_image->m_width - 1);
-        float v = float(j) / (m_image->m_height - 1);
-        
-        Ray r
-        (
-          m_camera->m_position,
-          m_camera->m_lowerLeftCorner + u * m_camera->m_right + v * m_camera->m_up - m_camera->m_position
-        ); // TODO Optimize out
+        Vec3 pixelColor = Vec3(0.0f);
+        for (int s = 0; s < m_samplesPerPixel; ++s)
+        {
+          float u = (i + RandomFloat()) / (m_image->m_width - 1);
+          float v = (j + RandomFloat()) / (m_image->m_height - 1);
 
-        Vec3 pixelColor = RayColor(r);
+          Ray ray = m_camera->GetRay(u, v);
 
-        WriteColor(pixelColor); // TODO optimize out
+          pixelColor += RayColor(ray, m_maxBounce);
+        }
+
+        SaveColor(pixelColor);
       }
     }
+
+    WriteColor();
 
     std::cerr << "\nDone.\n";
   }
 
-  Vec3 CPURenderer::RayColor(const Ray& ray)
+  Vec3 CPURenderer::RayColor(const Ray& ray, int depth)
   {
-    Intersection intersection; // TODO optimize out
+    if (depth <= 0)
+    {
+      return Vec3(0.0f);
+    }
+
+    Intersection intersection;
 
     // Scene
-    if (m_scene->Hit(ray, 0, FLOAT_INFINITY, intersection))
+    if (m_scene->Hit(ray, 0.001f, FLOAT_INFINITY, intersection))
     {
-      return 0.5f * (intersection.normal + Vec3(1.0f));
+      Ray scattered;
+      Vec3 attenuation;
+      if (intersection.material->Scatter(ray, intersection, attenuation, scattered))
+      {
+        return attenuation * RayColor(scattered, depth - 1);
+      }
+
+      return Vec3(0.0f);
     }
 
     // Background
     float t = 0.5f * (ray.m_direction.y + 1.0f);
-    return Vec3(1.0f - t) + t * Vec3(0.5f, 0.7f, 1.0f); // TODO optimize out
+    return Vec3(1.0f - t) + t * Vec3(0.5f, 0.7f, 1.0f);
   }
 
-  void CPURenderer::WriteColor(const Vec3& color)
+  void CPURenderer::SaveColor(const Vec3& color)
   {
-    std::cout << static_cast<int>(255.999f * color.x)
-    << ' ' << static_cast<int>(255.999f * color.y)
-    << ' ' << static_cast<int>(255.999f * color.z) << '\n';
+    float r = color.x;
+    float g = color.y;
+    float b = color.z;
+
+    float scale = 1.0f / m_samplesPerPixel;
+    r = glm::sqrt(scale * r);
+    g = glm::sqrt(scale * g);
+    b = glm::sqrt(scale * b);
+
+    m_outputBuffer[m_outputBufferOffset++] = static_cast<int>(256 * glm::clamp(r, 0.0f, 0.999f));
+    m_outputBuffer[m_outputBufferOffset++] = static_cast<int>(256 * glm::clamp(g, 0.0f, 0.999f));
+    m_outputBuffer[m_outputBufferOffset++] = static_cast<int>(256 * glm::clamp(b, 0.0f, 0.999f));
   }
 
+  void CPURenderer::WriteColor()
+  {
+    for (unsigned int i = 0; i < m_outputBufferLength; i+=3)
+    {
+      std::cout << m_outputBuffer[i + 0] << " "
+                << m_outputBuffer[i + 1] << " "
+                << m_outputBuffer[i + 2] << std::endl;
+    }
+  }
 } // namespace WoohooRT

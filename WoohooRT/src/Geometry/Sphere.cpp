@@ -1,13 +1,15 @@
 
 #include "Sphere.hpp"
+
 #include "../Engine/MathUtils.hpp"
 
 namespace WoohooRT
 {
-  Sphere::Sphere(Vec3 position, float radius)
+  Sphere::Sphere(Vec3 position, float radius, std::shared_ptr<Material> material)
   {
     m_position = position;
     m_radius = radius;
+    m_material = material;
   }
 
   bool Sphere::Hit(const Ray& ray, float tMin, float tMax, Intersection& intersection) const
@@ -38,8 +40,9 @@ namespace WoohooRT
 
     intersection.t = root;
     intersection.position = ray.At(root);
-    Vec3 outwardNormal = (intersection.position - m_position) / m_radius; // TODO optimize out
+    Vec3 outwardNormal = (intersection.position - m_position) / m_radius;
     intersection.setFaceNormal(ray, outwardNormal);
+    intersection.material = m_material;
 
     return true;
   }

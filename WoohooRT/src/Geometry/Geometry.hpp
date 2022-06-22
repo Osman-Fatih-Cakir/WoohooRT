@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "../Engine/Ray.hpp"
 
 namespace WoohooRT
@@ -14,6 +16,7 @@ namespace WoohooRT
 
   public:
     Vec3 m_position;
+    std::shared_ptr<Material> m_material;
   };
 
 } // namespace WoohooRT

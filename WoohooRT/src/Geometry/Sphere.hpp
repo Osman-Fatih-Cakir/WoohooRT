@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "Geometry.hpp"
 #include "../Engine/Types.hpp"
 
@@ -8,7 +10,7 @@ namespace WoohooRT
   class Sphere : public Geometry
   {
   public:
-    Sphere(Vec3 m_position, float radius);
+    Sphere(Vec3 m_position, float radius, std::shared_ptr<Material> material);
 
     bool Hit(const Ray& ray, float tMin, float tMax, Intersection& intersection) const override;
 

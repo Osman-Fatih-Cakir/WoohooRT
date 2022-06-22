@@ -72,7 +72,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)/Dependencies/glm;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)/Dependencies;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)Dependencies;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,8 +139,11 @@
     <ClCompile Include="src\Engine\Image.cpp" />
     <ClCompile Include="src\Engine\Ray.cpp" />
     <ClCompile Include="src\Engine\Renderer.cpp" />
+    <ClCompile Include="src\Engine\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Material\LambertianMaterial.cpp" />
+    <ClCompile Include="src\Material\MetalMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine\Camera.hpp" />
@@ -149,6 +155,9 @@
     <ClInclude Include="src\Engine\MathUtils.hpp" />
     <ClInclude Include="src\Geometry\Geometry.hpp" />
     <ClInclude Include="src\Geometry\Sphere.hpp" />
+    <ClInclude Include="src\Material\LambertianMaterial.hpp" />
+    <ClInclude Include="src\Material\Material.hpp" />
+    <ClInclude Include="src\Material\MetalMaterial.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

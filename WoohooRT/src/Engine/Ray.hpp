@@ -1,21 +1,22 @@
 #pragma once
 
+#include <memory>
+
 #include "Types.hpp"
+#include "../Material/Material.hpp"
 
 namespace WoohooRT
 {
   class Ray
   {
   public:
+    Ray();
     Ray(Vec3 origin, Vec3 direction);
 
     inline Vec3 At(float t) const
     {
       return m_origin + t * m_direction;
     }
-
-  private:
-    Ray() { };
 
   public:
     Vec3 m_origin;
@@ -26,6 +27,7 @@ namespace WoohooRT
   {
     Vec3 position;
     Vec3 normal;
+    std::shared_ptr<class Material> material;
     float t;
     bool frontFace;
 

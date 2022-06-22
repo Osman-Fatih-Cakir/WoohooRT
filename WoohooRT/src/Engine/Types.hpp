@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "glm.hpp"
+#include "glm/glm.hpp"
 
 namespace WoohooRT
 {

@@ -29,15 +29,22 @@ namespace WoohooRT
     m_outputBufferOffset = 0;
 
     // Camera
+    Vec3 eye = Vec3(3.0, 3.0f, 2.0f);
+    Vec3 target = Vec3(-1.0f, 0.0f, -1.0f);
+    Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
+    float distToFocus = glm::length(eye - target);
+    float aperture = 2.0f;
     m_camera = std::shared_ptr<Camera>
     (
       new Camera
       (
-        Vec3(-2.0f, 2.0f, 1.0f),
-        Vec3(0.0f, 0.0f, -1.0f),
-        Vec3(0.0f, 1.0f, 0.0f),
-        30.0f,
-        aspect
+        eye,
+        target,
+        up,
+        20.0f,
+        aspect,
+        aperture,
+        distToFocus
       )
     );
 

@@ -1,3 +1,4 @@
+#pragma once
 
 #include <limits>
 #include <random>
@@ -106,6 +107,16 @@ namespace WoohooRT
     else
     {
       return -vectorInUnitSphere;
+    }
+  }
+
+  inline Vec3 RandomInUnitDisk()
+  {
+    while (true)
+    {
+      Vec3 p = Vec3(RandomFloat(-1.0f, 1.0f), RandomFloat(-1.0f, 1.0f), 0.0f);
+      if (SquaredLength(p) >= 1.0f) continue;
+      return p;
     }
   }
 

@@ -9,6 +9,7 @@
 #include "../Geometry/Sphere.hpp"
 #include "../Material/LambertianMaterial.hpp"
 #include "../Material/MetalMaterial.hpp"
+#include "../Material/DielectricMaterial.hpp"
 
 namespace WoohooRT
 {
@@ -19,7 +20,7 @@ namespace WoohooRT
     int imageHeight = static_cast<int>(imageWidth / aspect);
 
     m_samplesPerPixel = 100;
-    m_maxBounce = 50;
+    m_maxBounce = 10;
 
     // Allocate output buffer
     m_outputBuffer = new int[3 * imageWidth * imageHeight];
@@ -43,21 +44,21 @@ namespace WoohooRT
 
     // Scene
     auto lambertianMat1 = std::make_shared<LambertianMaterial>(Vec3(0.8f, 0.8f, 0.0f));
-    auto lambertianMat2 = std::make_shared<LambertianMaterial>(Vec3(0.7f, 0.3f, 0.3f));
-    auto metalMat1 = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.8f, 0.8f), 0.0f);
-    auto metalMat2 = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.6f, 0.2f), 0.5f);
+    auto lambertianMat2 = std::make_shared<LambertianMaterial>(Vec3(0.1f, 0.2f, 0.5f));
+    auto metalMat1 = std::make_shared<DielectricMaterial>(Vec3(1.0f), 1.5f);
+    auto metalMat2 = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.6f, 0.2f), 0.3f);
 
     m_scene = std::shared_ptr<Scene>(new Scene());
 
     m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f, lambertianMat1)));
     m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f, lambertianMat2)));
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, metalMat1)));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), -0.4f, metalMat1))); // Negative radius for inside normals
     m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(1.0f, 0.0f, -1.0f), 0.5f, metalMat2)));
   }
 
   CPURenderer::~CPURenderer()
   {
-    delete m_outputBuffer;
+    delete[] m_outputBuffer;
   }
 
   void CPURenderer::Render()
@@ -84,6 +85,8 @@ namespace WoohooRT
         SaveColor(pixelColor);
       }
     }
+
+    std::cerr << "\nWriting image to file...\n";
 
     WriteColor();
 

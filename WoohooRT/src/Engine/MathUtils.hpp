@@ -1,6 +1,7 @@
 
 #include <limits>
 #include <random>
+#include <cmath>
 
 #include "glm/gtc/epsilon.hpp"
 #include "Types.hpp"
@@ -17,7 +18,7 @@ namespace WoohooRT
     return glm::normalize(vector);
   }
 
-  inline float SquaredLength(Vec3 vector)
+  inline float SquaredLength(const Vec3& vector)
   {
     return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
   }
@@ -44,7 +45,7 @@ namespace WoohooRT
   inline bool Vec3NearZero(const Vec3& vec)
   {
     static float min = 1e-8f;
-    return (fabs(vec.x) < min && fabs(vec.y) < min && fabs(vec.z) < min);
+    return (std::fabs(vec.x) < min && std::fabs(vec.y) < min && std::fabs(vec.z) < min);
   }
 
   /* Randomization operations */
@@ -113,6 +114,22 @@ namespace WoohooRT
   inline Vec3 Reflect(const Vec3& v1, const Vec3& v2)
   {
     return v1 - 2.0f * glm::dot(v1, v2) * v2;
+  }
+
+  inline Vec3 Refract(const Vec3& in, const Vec3& n, float etaInOverEtaOut)
+  {
+    float cosTheta = std::fmin(glm::dot(-in, n), 1.0f);
+    Vec3 outRayPerpendicular = etaInOverEtaOut * (in + cosTheta * n);
+    Vec3 outRayParallel =  -std::sqrtf(std::fabs(1.0f - SquaredLength(outRayPerpendicular))) * n;
+    return outRayPerpendicular + outRayParallel;
+  }
+
+  inline float Reflectance(float cosine, float refractionRatio)
+  {
+    // Schlick's approximation for reflectance
+    float r0 = (1.0f - refractionRatio) / (1.0f + refractionRatio);
+    r0 = r0 * r0;
+    return r0 + (1.0f - r0) * std::powf((1.0f - cosine), 5.0f);
   }
 
 } // namespace WoohooRT

@@ -142,6 +142,7 @@
     <ClCompile Include="src\Engine\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Material\DielectricMaterial.cpp" />
     <ClCompile Include="src\Material\LambertianMaterial.cpp" />
     <ClCompile Include="src\Material\MetalMaterial.cpp" />
   </ItemGroup>
@@ -155,6 +156,7 @@
     <ClInclude Include="src\Engine\MathUtils.hpp" />
     <ClInclude Include="src\Geometry\Geometry.hpp" />
     <ClInclude Include="src\Geometry\Sphere.hpp" />
+    <ClInclude Include="src\Material\DielectricMaterial.hpp" />
     <ClInclude Include="src\Material\LambertianMaterial.hpp" />
     <ClInclude Include="src\Material\Material.hpp" />
     <ClInclude Include="src\Material\MetalMaterial.hpp" />

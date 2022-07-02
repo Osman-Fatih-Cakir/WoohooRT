@@ -12,7 +12,7 @@ namespace WoohooRT
 
   bool LambertianMaterial::Scatter(const Ray& rayIn, const Intersection& intersection, Vec3& attenuation, Ray& scattered) const
   {
-    Vec3 scatterDirection = intersection.normal + RandomUnitVec3InUnitSphere();
+    Vec3 scatterDirection = intersection.normal + RandomUnitVec3();//RandomUnitVec3InUnitSphere();
     if (Vec3NearZero(scatterDirection)) // Zero check
     {
       scatterDirection = intersection.normal;

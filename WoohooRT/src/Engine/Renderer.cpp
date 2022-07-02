@@ -20,10 +20,10 @@ namespace WoohooRT
     std::cerr << "Initalizing scene...\n";
 
     float aspect = 3.0f / 2.0f;
-    int imageWidth = 1200;
+    int imageWidth = 600;
     int imageHeight = static_cast<int>(imageWidth / aspect);
 
-    m_samplesPerPixel = 500;
+    m_samplesPerPixel = 100;
     m_maxBounce = 50;
 
     // Allocate output buffer

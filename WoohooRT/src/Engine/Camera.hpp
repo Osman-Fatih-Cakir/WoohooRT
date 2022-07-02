@@ -8,7 +8,7 @@ namespace WoohooRT
   class Camera
   {
   public:
-    Camera(Vec3 pos, float viewportWidth, float viewportHeight, float focalLength);
+    Camera(const Vec3& pos, const Vec3& target, const Vec3& up, float vFov, float aspectRatio);
 
     inline Ray GetRay(float u, float v) const
     {
@@ -19,7 +19,6 @@ namespace WoohooRT
     float m_viewportHeight;
     float m_viewportWidth;
     float m_aspectRatio;
-    float m_focalLength;
 
     Vec3 m_position;
     Vec3 m_right;

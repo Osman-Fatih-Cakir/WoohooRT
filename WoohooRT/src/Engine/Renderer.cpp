@@ -1,6 +1,7 @@
 
 #include "Renderer.hpp"
 
+#include <cmath>
 #include <iostream>
 
 #include "glm/glm.hpp"
@@ -32,10 +33,11 @@ namespace WoohooRT
     (
       new Camera
       (
-        Vec3(0.0f),
-        2.0f * aspect,
-        2.0f,
-        1.0f
+        Vec3(-2.0f, 2.0f, 1.0f),
+        Vec3(0.0f, 0.0f, -1.0f),
+        Vec3(0.0f, 1.0f, 0.0f),
+        30.0f,
+        aspect
       )
     );
 
@@ -45,15 +47,20 @@ namespace WoohooRT
     // Scene
     auto lambertianMat1 = std::make_shared<LambertianMaterial>(Vec3(0.8f, 0.8f, 0.0f));
     auto lambertianMat2 = std::make_shared<LambertianMaterial>(Vec3(0.1f, 0.2f, 0.5f));
-    auto metalMat1 = std::make_shared<DielectricMaterial>(Vec3(1.0f), 1.5f);
-    auto metalMat2 = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.6f, 0.2f), 0.3f);
+    auto DielectricMat = std::make_shared<DielectricMaterial>(Vec3(1.0f, 1.0f, 1.0f), 1.5f);
+    auto MetalMat = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.6f, 0.2f), 0.0f);
 
     m_scene = std::shared_ptr<Scene>(new Scene());
 
+    float R = std::cos(PI / 4.0f);
     m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f, lambertianMat1)));
     m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f, lambertianMat2)));
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), -0.4f, metalMat1))); // Negative radius for inside normals
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(1.0f, 0.0f, -1.0f), 0.5f, metalMat2)));
+
+    // These two are same sphere. One for inside, one for outside
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, DielectricMat)));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), -0.45f, DielectricMat)));
+
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(1.0f, 0.0f, -1.0f), 0.45f, MetalMat)));
   }
 
   CPURenderer::~CPURenderer()

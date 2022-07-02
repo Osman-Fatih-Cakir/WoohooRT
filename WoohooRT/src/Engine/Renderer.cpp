@@ -8,6 +8,7 @@
 
 #include "MathUtils.hpp"
 #include "../Geometry/Sphere.hpp"
+#include "../Material/Material.hpp"
 #include "../Material/LambertianMaterial.hpp"
 #include "../Material/MetalMaterial.hpp"
 #include "../Material/DielectricMaterial.hpp"
@@ -16,12 +17,14 @@ namespace WoohooRT
 {
   CPURenderer::CPURenderer()
   {
-    float aspect = 16.0f / 9.0f;
-    int imageWidth = 400;
+    std::cerr << "Initalizing scene...\n";
+
+    float aspect = 3.0f / 2.0f;
+    int imageWidth = 1200;
     int imageHeight = static_cast<int>(imageWidth / aspect);
 
-    m_samplesPerPixel = 100;
-    m_maxBounce = 10;
+    m_samplesPerPixel = 500;
+    m_maxBounce = 50;
 
     // Allocate output buffer
     m_outputBuffer = new int[3 * imageWidth * imageHeight];
@@ -29,11 +32,11 @@ namespace WoohooRT
     m_outputBufferOffset = 0;
 
     // Camera
-    Vec3 eye = Vec3(3.0, 3.0f, 2.0f);
-    Vec3 target = Vec3(-1.0f, 0.0f, -1.0f);
+    Vec3 eye = Vec3(13.0, 2.0f, 3.0f);
+    Vec3 target = Vec3(0.0f, 0.0f, 0.0f);
     Vec3 up = Vec3(0.0f, 1.0f, 0.0f);
-    float distToFocus = glm::length(eye - target);
-    float aperture = 2.0f;
+    float distToFocus = 10.0f;
+    float aperture = 0.1f;
     m_camera = std::shared_ptr<Camera>
     (
       new Camera
@@ -52,22 +55,9 @@ namespace WoohooRT
     m_image = std::shared_ptr<Image>(new Image(imageWidth, imageHeight));
 
     // Scene
-    auto lambertianMat1 = std::make_shared<LambertianMaterial>(Vec3(0.8f, 0.8f, 0.0f));
-    auto lambertianMat2 = std::make_shared<LambertianMaterial>(Vec3(0.1f, 0.2f, 0.5f));
-    auto DielectricMat = std::make_shared<DielectricMaterial>(Vec3(1.0f, 1.0f, 1.0f), 1.5f);
-    auto MetalMat = std::make_shared<MetalMaterial>(Vec3(0.8f, 0.6f, 0.2f), 0.0f);
-
     m_scene = std::shared_ptr<Scene>(new Scene());
-
-    float R = std::cos(PI / 4.0f);
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f, lambertianMat1)));
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f, lambertianMat2)));
-
-    // These two are same sphere. One for inside, one for outside
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), 0.5f, DielectricMat)));
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-1.0f, 0.0f, -1.0f), -0.45f, DielectricMat)));
-
-    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(1.0f, 0.0f, -1.0f), 0.45f, MetalMat)));
+    CreateRandomScene();
+    std::cerr << "Initalizing scene is complete. Starting rendering...\n";
   }
 
   CPURenderer::~CPURenderer()
@@ -105,6 +95,57 @@ namespace WoohooRT
     WriteColor();
 
     std::cerr << "\nDone.\n";
+  }
+
+  void CPURenderer::CreateRandomScene()
+  {
+    auto groundMat = std::make_shared<LambertianMaterial>(Vec3(0.5f, 0.5f, 0.5f));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, -1000.f, 0.0f), 1000.0f, groundMat)));
+
+    for (int a = -11; a < 11; a++)
+    {
+      for (int b = -11; b < 11; b++)
+      {
+        float chooseMat = RandomFloat();
+        Vec3 center = Vec3(a + 0.9f * RandomFloat(), 0.2, b + 0.9f * RandomFloat());
+
+        if (glm::length(center - Vec3(4.0f, 0.2f, 0.0f)) > 0.9f)
+        {
+          std::shared_ptr<Material> sphereMat;
+
+          if (chooseMat < 0.8f)
+          {
+            // Diffuse
+            Vec3 albedo = RandomVec3() * RandomVec3();
+            sphereMat = std::make_shared<LambertianMaterial>(albedo);
+            m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(center, 0.2f, sphereMat)));
+          }
+          else if (chooseMat < 0.95f)
+          {
+            // Metal
+            Vec3 albedo = RandomVec3(0.5f, 1.0f);
+            float fuzz = RandomFloat(0.0f, 0.5f);
+            sphereMat = std::make_shared<MetalMaterial>(albedo, fuzz);;
+            m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(center, 0.2f, sphereMat)));
+          }
+          else
+          {
+            // Glass
+            sphereMat = std::make_shared<DielectricMaterial>(Vec3(1.0f), 1.5f);
+            m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(center, 0.2f, sphereMat)));
+          }
+        }
+      }
+    }
+
+    auto mat1 = std::make_shared<DielectricMaterial>(Vec3(1.0f), 1.5f);
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(0.0f, 1.0f, 0.0f), 1.0f, mat1)));
+
+    auto mat2 = std::make_shared<LambertianMaterial>(Vec3(0.4f, 0.2f, 0.1f));
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(-4.0f, 1.0f, 0.0f), 1.0f, mat2)));
+
+    auto mat3 = std::make_shared<MetalMaterial>(Vec3(0.7f, 0.6f, 0.5f), 0.0f);
+    m_scene->AddGeometry(std::shared_ptr<Sphere>(new Sphere(Vec3(4.0f, 1.0f, 0.0f), 1.0f, mat3)));
   }
 
   Vec3 CPURenderer::RayColor(const Ray& ray, int depth)

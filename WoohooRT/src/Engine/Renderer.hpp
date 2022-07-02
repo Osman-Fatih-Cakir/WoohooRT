@@ -27,6 +27,7 @@ namespace WoohooRT
     void Render();
 
   private:
+    void CreateRandomScene();
     Vec3 RayColor(const Ray& ray, int depth);
     void SaveColor(const Vec3& color);
     void WriteColor();

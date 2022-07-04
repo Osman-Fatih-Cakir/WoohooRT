@@ -1,19 +1,18 @@
 
-#include <iostream>
-#include <memory>
-#include <chrono>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
-#include "Engine/Renderer.hpp"
+#include "App.hpp"
 
 int main()
 {
-  std::shared_ptr<WoohooRT::CPURenderer> cpuRenderer(new WoohooRT::CPURenderer);
+  _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 
-  auto start = std::chrono::steady_clock::now();
-  cpuRenderer->Render();
-  auto end = std::chrono::steady_clock::now();
+  std::shared_ptr<WoohooRT::App> app(new WoohooRT::App());
+  app->Start();
 
-  std::cerr << "\r\nElapsed Time: " << std::chrono::duration_cast<std::chrono::seconds>(end - start).count() << " seconds.";
+  _CrtDumpMemoryLeaks();
 
   return 0;
 }

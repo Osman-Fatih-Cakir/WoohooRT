@@ -10,7 +10,7 @@ This project is WIP. Hoping it will be a good ray tracer soon.
 
 ## Screenshots
 ### 1200 x 800
-<img src="./Outputs/image1.png" width="1200" height="800" />  
+<img src="./Outputs/image1.png" width="1200" height="675" />  
 
 ## GPU Ray Tracer (Coming Soon):
 - Not implemented yet. Planning to implement with DXR(DirectX Ray Tracing).

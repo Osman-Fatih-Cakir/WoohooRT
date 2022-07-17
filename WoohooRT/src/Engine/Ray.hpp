@@ -4,6 +4,7 @@
 
 #include "Types.hpp"
 #include "../Material/Material.hpp"
+#include "../Engine/MathUtils.hpp"
 
 namespace WoohooRT
 {
@@ -34,7 +35,7 @@ namespace WoohooRT
     inline void setFaceNormal(const Ray& ray, const Vec3& outwardNormal)
     {
       frontFace = glm::dot(ray.m_direction, outwardNormal) < 0.0f;
-      normal = frontFace ? outwardNormal : -outwardNormal;
+      normal = UnitVector(frontFace ? outwardNormal : -outwardNormal);
     }
   };
 

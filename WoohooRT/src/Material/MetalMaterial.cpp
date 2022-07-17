@@ -14,13 +14,10 @@ namespace WoohooRT
   bool MetalMaterial::Scatter(const Ray& rayIn, const Intersection& intersection, Vec3& attenuation, Ray& scattered) const
   {
     Vec3 reflected = Reflect(UnitVector(rayIn.m_direction), intersection.normal);
-    Vec3 fuzzy = Vec3(0.0f);
-    if (m_fuzzy != 0.0f)
-    {
-      fuzzy = m_fuzzy * RandomVec3InUnitSphere();
-    }
-    scattered = Ray(intersection.position, reflected + fuzzy);
+    Vec3 fuzzy = m_fuzzy * RandomVec3InUnitSphere();
+    scattered = Ray(intersection.position, reflected);
     attenuation = m_albedo;
+
     return (glm::dot(scattered.m_direction, intersection.normal) > 0.0f);
   }
 

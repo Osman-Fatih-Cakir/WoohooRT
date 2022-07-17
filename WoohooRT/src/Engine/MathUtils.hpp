@@ -1,3 +1,4 @@
+#pragma once
 
 #include <limits>
 #include <random>
@@ -32,9 +33,9 @@ namespace WoohooRT
 
   inline float RandomFloat(float min, float max)
   {
-    static std::uniform_real_distribution<float> distribution(min, max);
+    static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
     static std::mt19937 generator;
-    return distribution(generator);
+    return min + distribution(generator) * (max - min);
   }
 
   inline bool Vec3EpsilonEqual(float epsilon, const Vec3& vec1, const Vec3& vec2)
@@ -109,6 +110,16 @@ namespace WoohooRT
     }
   }
 
+  inline Vec3 RandomInUnitDisk()
+  {
+    while (true)
+    {
+      Vec3 p = Vec3(RandomFloat(-1.0f, 1.0f), RandomFloat(-1.0f, 1.0f), 0.0f);
+      if (SquaredLength(p) >= 1.0f) continue;
+      return p;
+    }
+  }
+
   /* 3D Math Operations */
 
   inline Vec3 Reflect(const Vec3& v1, const Vec3& v2)
@@ -129,7 +140,7 @@ namespace WoohooRT
     // Schlick's approximation for reflectance
     float r0 = (1.0f - refractionRatio) / (1.0f + refractionRatio);
     r0 = r0 * r0;
-    return r0 + (1.0f - r0) * std::powf((1.0f - cosine), 5.0f);
+    return r0 + (1.0f - r0) * std::powf(1.0f - cosine, 5.0f);
   }
 
 } // namespace WoohooRT

@@ -2,29 +2,36 @@
 
 #include "Types.hpp"
 #include "Ray.hpp"
+#include "MathUtils.hpp"
 
 namespace WoohooRT
 {
   class Camera
   {
   public:
-    Camera(Vec3 pos, float viewportWidth, float viewportHeight, float focalLength);
+    Camera(const Vec3& pos, const Vec3& target, const Vec3& up, float vFov, float aspectRatio, float aperture, float focusDist);
 
-    inline Ray GetRay(float u, float v) const
+    inline Ray GetRay(float s, float t) const
     {
       /* TODO Maybe returning a pointer and the renderer (or whoever calls) have a preallocated ray array */
-      return Ray(m_position, m_lowerLeftCorner + u * m_right + v * m_up - m_position);
+      Vec3 rd = m_lensRadius * RandomInUnitDisk();
+      Vec3 offset = m_u * rd.x + m_v * rd.y;
+      return Ray(m_position + offset, m_lowerLeftCorner + s * m_horizontal + t * m_vertical - m_position - offset);
     }
 
     float m_viewportHeight;
     float m_viewportWidth;
     float m_aspectRatio;
-    float m_focalLength;
 
     Vec3 m_position;
-    Vec3 m_right;
-    Vec3 m_up;
+    Vec3 m_horizontal;
+    Vec3 m_vertical;
     Vec3 m_lowerLeftCorner;
+
+    Vec3 m_w; // Vector points camera back
+    Vec3 m_v; // Vector points camera up
+    Vec3 m_u; // Vector points camera right
+    float m_lensRadius;
   };
 
 } // namespace WoohooRT

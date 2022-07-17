@@ -12,11 +12,22 @@
 
 namespace WoohooRT
 {
+  struct ThreadData
+  {
+    std::shared_ptr<Scene> scene;
+    IVec2 size;
+    int index;
+    int* buffer;
+    int startX;
+    int endX;
+    int samplesPerPixel;
+    int numChannels;
+  };
+
   class Renderer
   {
   public:
-    virtual void Render() = 0;
-    
+    virtual void BeginRender() = 0;
   };
 
   class CPURenderer : public Renderer
@@ -24,11 +35,13 @@ namespace WoohooRT
   public:
     CPURenderer();
     ~CPURenderer();
-    void Render();
+    void BeginRender();
 
   private:
-    Vec3 RayColor(const Ray& ray, int depth);
-    void SaveColor(const Vec3& color);
+    void CreateRandomScene();
+    void RenderThread(struct ThreadData* td);
+    Vec3 RayColor(std::shared_ptr<Scene> scene, const Ray& ray, int depth);
+    void SaveColor(struct ThreadData* td, const Vec3& color, int col, int row);
     void WriteColor();
 
   public:
@@ -42,7 +55,7 @@ namespace WoohooRT
   private:
     int* m_outputBuffer;
     unsigned int m_outputBufferLength;
-    unsigned int m_outputBufferOffset;
+    int m_numChannels;
   };
 
 } // namespace WoohooRT

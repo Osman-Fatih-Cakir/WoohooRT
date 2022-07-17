@@ -15,7 +15,7 @@ namespace WoohooRT
   bool DielectricMaterial::Scatter(const Ray& rayIn, const Intersection& intersection, Vec3& attenuation, Ray& scattered) const
   {
     // TODO This can be optimized to calculating this value before rendering starts (or maybe even calculating all permutations of refractionRatios)
-    float refractionRatio = intersection.frontFace ? (1.0f / m_ir) : m_ir; // NOTE Assuming all rays come from air (which is not that great estimation I think)
+    float refractionRatio = intersection.frontFace ? (1.0f / m_ir) : m_ir; // NOTE Assuming all rays come from air (I don't think that's a great estimation)
     Vec3 unitDirection = UnitVector(rayIn.m_direction);
 
     float cosTheta = std::fmin(glm::dot(-unitDirection, UnitVector(intersection.normal)), 1.0f);

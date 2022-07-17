@@ -1,14 +1,14 @@
 # WoohooRT
 A path tracer.
 
-###Note:
+### Note:
 This project in WIP. Hoping it will be a good ray tracer soon.
 
-##CPU Ray Tracer:
+## CPU Ray Tracer:
 - Multithread simple ray tracer.
 
 
-##GPU Ray Tracer:
+## GPU Ray Tracer:
 - Not implemented yet. Planning to implement with DXR(DirectX Ray Tracing).
 
 

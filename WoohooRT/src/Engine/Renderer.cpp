@@ -22,10 +22,10 @@ namespace WoohooRT
     std::cerr << "Initalizing...\n";
 
     float aspect = 3.0f / 2.0f;
-    int imageWidth = 1200;
+    int imageWidth = 600;
     int imageHeight = static_cast<int>(imageWidth / aspect);
 
-    m_samplesPerPixel = 500;
+    m_samplesPerPixel = 250;
     m_maxBounce = 50;
 
     m_numChannels = 3;

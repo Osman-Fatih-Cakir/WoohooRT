@@ -16,12 +16,8 @@ namespace WoohooRT
   {
     static Vec3 centerToOrigin;
     centerToOrigin = ray.m_origin - m_position;
-    // I implemented the dot and SquareLength vectors because those were taking less time according to Visual Studio profiler
-    // and this function is on the hottest path for this program
-    //float a = SquaredLength(ray.m_direction);
-    //float halfB = glm::dot(centerToOrigin, ray.m_direction);
-    float a = ray.m_direction.x * ray.m_direction.x + ray.m_direction.y * ray.m_direction.y + ray.m_direction.z * ray.m_direction.z;
-    float halfB = centerToOrigin.x * ray.m_direction.x + centerToOrigin.y * ray.m_direction.y + centerToOrigin.z * ray.m_direction.z;
+    float a = SquaredLength(ray.m_direction);
+    float halfB = glm::dot(centerToOrigin, ray.m_direction);
     float c = SquaredLength(centerToOrigin) - m_radius * m_radius;
     float discriminant = halfB * halfB - a * c;
 

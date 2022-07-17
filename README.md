@@ -9,6 +9,7 @@ This project is WIP. Hoping it will be a good ray tracer soon.
 - More on the way :)
 
 ## Screenshots
+### 1200 x 800
 <img src="./Outputs/image1.png" width="1200" height="800" />  
 
 ## GPU Ray Tracer (Coming Soon):

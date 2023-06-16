@@ -127,7 +127,7 @@ namespace WoohooRT
   {
     for (int j = 0; j < td->size.y; ++j)
     {
-      std::cerr << "\r||" << j << "||" << std::flush;
+      //std::cerr << "\r||" << j << "||" << std::flush;
       for (int i = td->startX; i < td->endX; ++i)
       {
         Vec3 pixelColor = Vec3(0.0f);

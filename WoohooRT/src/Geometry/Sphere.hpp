@@ -7,7 +7,7 @@
 
 namespace WoohooRT
 {
-  class Sphere : public Geometry
+  class Sphere final : public Geometry
   {
   public:
     Sphere(Vec3 m_position, float radius, std::shared_ptr<Material> material);

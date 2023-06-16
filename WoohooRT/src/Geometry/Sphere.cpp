@@ -14,8 +14,7 @@ namespace WoohooRT
 
   bool Sphere::Hit(const Ray& ray, float tMin, float tMax, Intersection& intersection) const
   {
-    static Vec3 centerToOrigin;
-    centerToOrigin = ray.m_origin - m_position;
+    Vec3 centerToOrigin = ray.m_origin - m_position;
     float a = SquaredLength(ray.m_direction);
     float halfB = glm::dot(centerToOrigin, ray.m_direction);
     float c = SquaredLength(centerToOrigin) - m_radius * m_radius;
